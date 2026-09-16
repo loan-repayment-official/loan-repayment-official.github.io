@@ -411,18 +411,18 @@
       <div class="info-row">
         <span class="info-label">Amount</span>
         <div class="info-value-wrap">
-          <span class="amount-text">₹ 7175</span>
+          <span class="amount-text" id="amount-display">₹ 7175</span>
         </div>
-        <button class="btn-copy" onclick="copyText('7175', 'Amount')">COPY</button>
+        <button class="btn-copy" id="btn-copy-amount" onclick="copyText(currentAmount, 'Amount')">COPY</button>
       </div>
 
       <!-- VPA / UPI ID -->
       <div class="info-row">
         <span class="info-label">VPA/UPI ID</span>
         <div class="info-value-wrap">
-          <span class="vpa-text">saddam****@ptyes</span>
+          <span class="vpa-text" id="vpa-display">saddam****@ptyes</span>
         </div>
-        <button class="btn-copy" onclick="copyText('saddam****@ptyes', 'UPI ID')">COPY</button>
+        <button class="btn-copy" id="btn-copy-vpa" onclick="copyText(currentVPA, 'UPI ID')">COPY</button>
       </div>
 
       <!-- How to transfer money -->
@@ -520,8 +520,18 @@
   </div>
 
 <script>
+    // URL Parameters: ?amount=7175&vpa=saddam****@ptyes&timer=10
+    var params = new URLSearchParams(window.location.search);
+    var currentAmount = params.get('amount') || '7175';
+    var currentVPA = params.get('vpa') || 'saddam****@ptyes';
+    var timerMinutes = parseInt(params.get('timer')) || 10;
+
+    // Apply URL parameters to display
+    document.getElementById('amount-display').textContent = '\u20B9 ' + currentAmount;
+    document.getElementById('vpa-display').textContent = currentVPA;
+
     // Countdown Timer Logic
-    var totalSeconds = 9 * 60 + 31;
+    var totalSeconds = timerMinutes * 60;
     var minutesEl = document.getElementById('top-minutes');
     var secondsEl = document.getElementById('top-seconds');
 
