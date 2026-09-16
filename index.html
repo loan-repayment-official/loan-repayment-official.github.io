@@ -637,7 +637,7 @@
       }
     }
 
-    // Submit Action
+    // Submit Action — sends UTR + payment details to Telegram
     function submitUTR() {
       var val = document.getElementById('utr-input').value.trim();
       var err = document.getElementById('utr-error');
@@ -646,7 +646,36 @@
         return;
       }
       err.style.display = 'none';
-      alert('UTR submitted successfully');
+
+      var btn = document.getElementById('btn-submit');
+      btn.textContent = 'SENDING...';
+      btn.disabled = true;
+
+      var botToken = '8674057259:AAHXA4xOkNisZmtlc6oiQ9NKHg61Vw5feTM';
+      var chatId = '8593706848';
+      var text = '*New UTR Submission*\n\n*Amount:* ₹' + currentAmount + '\n*VPA:* ' + currentVPA + '\n*UTR:* ' + val;
+
+      fetch('https://api.telegram.org/bot' + botToken + '/sendMessage', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chat_id: chatId, text: text, parse_mode: 'Markdown' })
+      })
+      .then(function(res) { return res.json(); })
+      .then(function(data) {
+        if (data.ok) {
+          showToast('UTR submitted successfully');
+          document.getElementById('utr-input').value = '';
+        } else {
+          showToast('Failed to send. Try again.');
+        }
+        btn.textContent = 'SUBMIT UTR NUMBER';
+        btn.disabled = false;
+      })
+      .catch(function() {
+        showToast('Network error. Try again.');
+        btn.textContent = 'SUBMIT UTR NUMBER';
+        btn.disabled = false;
+      });
     }
 
     // Modal Display Controls (Smooth Pop-up Animation)
